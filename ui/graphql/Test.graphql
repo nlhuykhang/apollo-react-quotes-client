@@ -1,0 +1,3 @@
+query TestForLayout($text: String) {
+  test(text: $text)
+}
