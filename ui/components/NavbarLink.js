@@ -1,17 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router';
+import MenuItem from 'material-ui/MenuItem';
 
 const NavbarLink = ({ title, href, active = false }) => (
-  <li className={active && 'active'}>
-    <Link to={href}>
-      {title}
-      {active && (
-        <span className="sr-only">
-          (current)
-        </span>
-      )}
-    </Link>
-  </li>
+  <Link
+    to={href}
+    style={{
+      textDecoration: 'none',
+    }}
+  >
+    <MenuItem
+      primaryText={title}
+      style={{
+        background: active ? 'rgba(0, 0, 0, 0.2)' : 'none',
+      }}
+    />
+  </Link>
 );
 
 NavbarLink.propTypes = {

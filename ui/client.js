@@ -1,9 +1,10 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { Router, browserHistory } from 'react-router';
+import { Router, browserHistory, match } from 'react-router';
 import { ApolloProvider } from 'react-apollo';
 import { SubscriptionClient, addGraphQLSubscriptions } from 'subscriptions-transport-ws';
 import * as ReactGA from 'react-ga';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 // Polyfill fetch
 import 'isomorphic-fetch';
@@ -38,9 +39,11 @@ const client = createApolloClient({
 });
 
 render((
-  <ApolloProvider client={client}>
-    <Router history={browserHistory} onUpdate={logPageView}>
-      {routes}
-    </Router>
-  </ApolloProvider>
+  <MuiThemeProvider>
+    <ApolloProvider client={client}>
+      <Router history={browserHistory} onUpdate={logPageView}>
+        {routes}
+      </Router>
+    </ApolloProvider>
+  </MuiThemeProvider>
 ), document.getElementById('content'));

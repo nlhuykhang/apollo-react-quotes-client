@@ -3,6 +3,7 @@ import 'isomorphic-fetch';
 import Express from 'express';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import { ApolloProvider, renderToStringWithData } from 'react-apollo';
 import { match, RouterContext } from 'react-router';
 import path from 'path';
@@ -52,9 +53,11 @@ app.use((req, res) => {
       });
 
       const component = (
-        <ApolloProvider client={client}>
-          <RouterContext {...renderProps} />
-        </ApolloProvider>
+        <MuiThemeProvider>
+          <ApolloProvider client={client}>
+            <RouterContext {...renderProps} />
+          </ApolloProvider>
+        </MuiThemeProvider>
       );
 
       renderToStringWithData(component).then((content) => {
