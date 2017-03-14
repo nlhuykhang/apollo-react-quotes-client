@@ -1,0 +1,10 @@
+query RandomFeed {
+  randomFeed {
+    id
+    content
+    author {
+      name
+    }
+    votes
+  }
+}

@@ -4,7 +4,7 @@ import { graphql } from 'react-apollo';
 import Loading from '../components/Loading';
 import RandomFeed from '../components/RandomFeed';
 
-import RANDOMFEED from '../graphql/RandomFeed';
+import RANDOMFEED from '../graphql/RandomFeed.graphql';
 
 class RandomFeedPage extends React.Component {
   static propTypes = {
@@ -22,7 +22,11 @@ class RandomFeedPage extends React.Component {
 
     return (
       <div>
-        {loading ? <Loading /> : <RandomFeed quotes={quotes} />}
+        {
+          loading ?
+            <Loading /> :
+            <RandomFeed quotes={quotes} />
+        }
       </div>
     );
   }
@@ -35,9 +39,9 @@ const withData = graphql(RANDOMFEED, {
       limit: props.params && props.params.limit,
     },
   }),
-  props: ({ data: { loading, quotes } }) => ({
+  props: ({ data: { loading, randomFeed = [] } }) => ({
     loading,
-    quotes,
+    quotes: randomFeed,
   }),
 });
 
