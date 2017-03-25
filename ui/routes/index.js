@@ -6,6 +6,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import Layout from './Layout';
 import TestPage from './TestPage';
 import RandomFeedPage from './RandomFeedPage';
+import SavedFeedPage from './SavedFeedPage';
 
 
 injectTapEventPlugin();
@@ -19,12 +20,19 @@ export default (
       component={TestPage}
     />
     <Route
+      name="Test"
       path="/test/:text"
       component={TestPage}
     />
     <Route
+      name="Random Quotes"
       path="/random"
       component={RandomFeedPage}
+    />
+    <Route
+      name="Saved Quotes"
+      path="/saved"
+      component={SavedFeedPage}
     />
     {/* keep below route for references */}
     {/* <Route
