@@ -1,0 +1,10 @@
+mutation SaveOneQuote($quote: QuoteInput!) {
+  saveOneQuote(quoteInput: $quote) {
+    id
+    content
+    author {
+      name
+    }
+    votes
+  }
+}

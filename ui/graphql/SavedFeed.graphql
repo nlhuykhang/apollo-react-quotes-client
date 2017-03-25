@@ -1,0 +1,10 @@
+query SavedFeed {
+  getSavedQuotes {
+    id
+    content
+    author {
+      name
+    }
+    votes
+  }
+}
