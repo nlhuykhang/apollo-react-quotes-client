@@ -3,12 +3,15 @@ import React from 'react';
 import { Card, CardActions, CardHeader, CardText } from 'material-ui/Card';
 import IconButton from 'material-ui/IconButton';
 import ContentSave from 'material-ui/svg-icons/content/save';
+import ActionDelete from 'material-ui/svg-icons/action/delete';
 
 export default class Quote extends React.Component {
   static propTypes = {
     quote: React.PropTypes.object,
     saveQuote: React.PropTypes.func,
+    deleteQuote: React.PropTypes.func,
     isShowSaveButton: React.PropTypes.bool,
+    isShowDeleteButton: React.PropTypes.bool,
   };
 
   state = {};
@@ -16,6 +19,7 @@ export default class Quote extends React.Component {
   onTouchSaveQuote = () => {
     const {
       quote,
+      saveQuote,
     } = this.props;
 
     const {
@@ -23,10 +27,19 @@ export default class Quote extends React.Component {
       author,
     } = quote;
 
-    this.props.saveQuote({
+    saveQuote({
       content,
       authorName: author.name,
     });
+  }
+
+  onTouchDeleteQuote = () => {
+    const {
+      quote,
+      deleteQuote,
+    } = this.props;
+
+    deleteQuote(quote.id);
   }
 
   renderSaveButton() {
@@ -40,6 +53,24 @@ export default class Quote extends React.Component {
           }}
         >
           <ContentSave />
+        </IconButton>
+      );
+    }
+
+    return null;
+  }
+
+  renderDeleteButton() {
+    if (this.props.isShowDeleteButton) {
+      return (
+        <IconButton
+          onTouchTap={this.onTouchDeleteQuote}
+          tooltip="Delete Quote"
+          style={{
+            padding: '0px',
+          }}
+        >
+          <ActionDelete />
         </IconButton>
       );
     }
@@ -79,6 +110,7 @@ export default class Quote extends React.Component {
           }}
         >
           {this.renderSaveButton()}
+          {this.renderDeleteButton()}
         </CardActions>
       </Card>
     );

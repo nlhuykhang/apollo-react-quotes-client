@@ -2,17 +2,25 @@ import React from 'react';
 
 import Quote from './Quote';
 
-const RandomFeed = ({ quotes }) => (
+const SavedFeed = ({ quotes, deleteQuote }) => (
   <div>
-    {quotes.map((quote, i) => <Quote key={i} quote={quote} />)}
+    {quotes.map((quote, i) =>
+      <Quote
+        key={i}
+        quote={quote}
+        deleteQuote={deleteQuote}
+        isShowDeleteButton
+      />
+    )}
   </div>
 );
 
-RandomFeed.propTypes = {
+SavedFeed.propTypes = {
   quotes: React.PropTypes.arrayOf(
     React.PropTypes.object
   ),
+  deleteQuote: React.PropTypes.func,
 };
 
 
-export default RandomFeed;
+export default SavedFeed;

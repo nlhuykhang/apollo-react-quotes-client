@@ -5,14 +5,16 @@ import Loading from '../components/Loading';
 import SavedFeed from '../components/SavedFeed';
 
 import SAVEDFEED from '../graphql/SavedFeed.graphql';
+import DELETE_QUOTE_MUTATION from '../graphql/DeleteQuote.graphql';
 
-class RandomFeedPage extends React.Component {
+class SavedFeedPage extends React.Component {
   static propTypes = {
     loading: React.PropTypes.bool.isRequired,
     quotes: React.PropTypes.arrayOf(
       React.PropTypes.object
     ).isRequired,
     refetch: React.PropTypes.func,
+    deleteQuote: React.PropTypes.func,
   };
   state = {
     skip: 0,
@@ -21,14 +23,18 @@ class RandomFeedPage extends React.Component {
 
 
   render() {
-    const { loading, quotes } = this.props;
+    const {
+      loading,
+      quotes,
+      deleteQuote,
+    } = this.props;
 
     return (
       <div>
         {
           loading ?
             <Loading /> :
-            <SavedFeed quotes={quotes} />
+            <SavedFeed quotes={quotes} deleteQuote={deleteQuote} />
         }
       </div>
     );
@@ -49,4 +55,14 @@ const withData = graphql(SAVEDFEED, {
   }),
 });
 
-export default withData(RandomFeedPage);
+const withMutations = graphql(DELETE_QUOTE_MUTATION, {
+  props: ({ mutate }) => ({
+    deleteQuote: quoteId => mutate({
+      variables: {
+        quoteId,
+      },
+    }),
+  }),
+});
+
+export default withMutations(withData(SavedFeedPage));
