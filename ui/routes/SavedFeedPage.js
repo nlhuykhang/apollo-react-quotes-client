@@ -5,6 +5,8 @@ import update from 'immutability-helper';
 import Loading from '../components/Loading';
 import SavedFeed from '../components/SavedFeed';
 
+import reducerFactory from '../helpers/reducerFactory';
+
 import SAVEDFEED from '../graphql/SavedFeed.graphql';
 import DELETE_QUOTE_MUTATION from '../graphql/DeleteQuote.graphql';
 
@@ -65,26 +67,15 @@ function savedFeedMutationReducer(prevResults, action) {
   }
 }
 
-function savedFeedReducer(prevResults, action, variables) {
-  let newResults = prevResults;
-
-  switch (action.type) {
-    case 'APOLLO_MUTATION_RESULT':
-      newResults = savedFeedMutationReducer(prevResults, action, variables);
-      break;
-    default:
-  }
-
-  return newResults;
-}
-
 const withData = graphql(SAVEDFEED, {
   options: props => ({
     variables: {
       skip: props.params && props.params.skip,
       limit: props.params && props.params.limit,
     },
-    reducer: savedFeedReducer,
+    reducer: reducerFactory({
+      mutationReducer: savedFeedMutationReducer,
+    }),
   }),
   props: ({ data: { loading, getSavedQuotes = [], refetch } }) => ({
     loading,

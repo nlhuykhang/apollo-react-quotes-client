@@ -5,6 +5,8 @@ import update from 'immutability-helper';
 import Loading from '../components/Loading';
 import RandomFeed from '../components/RandomFeed';
 
+import reducerFactory from '../helpers/reducerFactory';
+
 import RANDOMFEED from '../graphql/RandomFeed.graphql';
 import SAVE_QUOTE_MUTATION from '../graphql/SaveQuote.graphql';
 
@@ -74,26 +76,15 @@ function randomFeedMutationReducer(prevResults, action) {
   }
 }
 
-function randomFeedReducer(prevResults, action, variables) {
-  let newResults = prevResults;
-
-  switch (action.type) {
-    case 'APOLLO_MUTATION_RESULT':
-      newResults = randomFeedMutationReducer(prevResults, action, variables);
-      break;
-    default:
-  }
-
-  return newResults;
-}
-
 const withData = graphql(RANDOMFEED, {
   options: props => ({
     variables: {
       skip: props.params && props.params.skip,
       limit: props.params && props.params.limit,
     },
-    reducer: randomFeedReducer,
+    reducer: reducerFactory({
+      mutationReducer: randomFeedMutationReducer,
+    }),
   }),
   props: ({ data: { loading, randomFeed = [], refetch } }) => ({
     loading,
