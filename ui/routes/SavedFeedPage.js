@@ -1,5 +1,6 @@
 import React from 'react';
 import { graphql } from 'react-apollo';
+import update from 'immutability-helper';
 
 import Loading from '../components/Loading';
 import SavedFeed from '../components/SavedFeed';
@@ -41,12 +42,49 @@ class SavedFeedPage extends React.Component {
   }
 }
 
+function removeQuoteById(quotes, removeQuoteId) {
+  return quotes.filter(({ id }) => id !== removeQuoteId);
+}
+
+function getStoreAfterDeleteQuote(prevResults, action) {
+  const deleteQuoteById = action.result.data.deleteQuoteById;
+
+  return update(prevResults, {
+    getSavedQuotes: {
+      $apply: savedQuotes => removeQuoteById(savedQuotes, deleteQuoteById),
+    },
+  });
+}
+
+function savedFeedMutationReducer(prevResults, action) {
+  switch (action.operationName) {
+    case 'DeleteQuote':
+      return getStoreAfterDeleteQuote(prevResults, action);
+    default:
+      return prevResults;
+  }
+}
+
+function savedFeedReducer(prevResults, action, variables) {
+  let newResults = prevResults;
+
+  switch (action.type) {
+    case 'APOLLO_MUTATION_RESULT':
+      newResults = savedFeedMutationReducer(prevResults, action, variables);
+      break;
+    default:
+  }
+
+  return newResults;
+}
+
 const withData = graphql(SAVEDFEED, {
   options: props => ({
     variables: {
       skip: props.params && props.params.skip,
       limit: props.params && props.params.limit,
     },
+    reducer: savedFeedReducer,
   }),
   props: ({ data: { loading, getSavedQuotes = [], refetch } }) => ({
     loading,
@@ -60,6 +98,9 @@ const withMutations = graphql(DELETE_QUOTE_MUTATION, {
     deleteQuote: quoteId => mutate({
       variables: {
         quoteId,
+      },
+      optimisticResponse: {
+        deleteQuoteById: quoteId,
       },
     }),
   }),
