@@ -1,5 +1,6 @@
 import React from 'react';
 import { graphql } from 'react-apollo';
+import update from 'immutability-helper';
 
 import Loading from '../components/Loading';
 import RandomFeed from '../components/RandomFeed';
@@ -51,12 +52,48 @@ class RandomFeedPage extends React.Component {
   }
 }
 
+function removeSavedQuoteFromRandomQuotes(randomQuotes, savedQuote) {
+  return randomQuotes.filter(quote => quote.content !== savedQuote.content);
+}
+
+function getStoreAfterSaveOneQuote(prevResults, action) {
+  const savedQuote = action.result.data.saveOneQuote;
+  return update(prevResults, {
+    randomFeed: {
+      $apply: randomQuotes => removeSavedQuoteFromRandomQuotes(randomQuotes, savedQuote),
+    },
+  });
+}
+
+function randomFeedMutationReducer(prevResults, action) {
+  switch (action.operationName) {
+    case 'SaveOneQuote':
+      return getStoreAfterSaveOneQuote(prevResults, action);
+    default:
+      return prevResults;
+  }
+}
+
+function randomFeedReducer(prevResults, action, variables) {
+  let newResults = prevResults;
+
+  switch (action.type) {
+    case 'APOLLO_MUTATION_RESULT':
+      newResults = randomFeedMutationReducer(prevResults, action, variables);
+      break;
+    default:
+  }
+
+  return newResults;
+}
+
 const withData = graphql(RANDOMFEED, {
   options: props => ({
     variables: {
       skip: props.params && props.params.skip,
       limit: props.params && props.params.limit,
     },
+    reducer: randomFeedReducer,
   }),
   props: ({ data: { loading, randomFeed = [], refetch } }) => ({
     loading,
@@ -64,29 +101,6 @@ const withData = graphql(RANDOMFEED, {
     refetch,
   }),
 });
-
-function getCurrentRandomFeedData(proxy) {
-  return proxy.readQuery({
-    query: RANDOMFEED,
-  });
-}
-
-function setRandomFeedData(proxy, newData) {
-  proxy.writeQuery({
-    query: RANDOMFEED,
-    data: newData,
-  });
-}
-
-function removeAQuoteFromRandomFeedData(randomFeedData, quote) {
-  const newRandomFeed = randomFeedData.randomFeed.filter(
-    ({ content }) => content !== quote.content
-  );
-
-  return Object.assign({}, randomFeedData, {
-    randomFeed: newRandomFeed,
-  });
-}
 
 const withMutations = graphql(SAVE_QUOTE_MUTATION, {
   props: ({ mutate }) => ({
@@ -103,16 +117,6 @@ const withMutations = graphql(SAVE_QUOTE_MUTATION, {
           },
           votes: 0,
         },
-      },
-      update: (proxy, { data: { saveOneQuote: savedQuote } }) => {
-        const currentRandomFeedData = getCurrentRandomFeedData(proxy);
-
-        const newRandomFeedData = removeAQuoteFromRandomFeedData(
-          currentRandomFeedData,
-          savedQuote
-        );
-
-        setRandomFeedData(proxy, newRandomFeedData);
       },
     }),
   }),
